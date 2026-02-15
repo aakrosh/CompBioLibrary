@@ -1,0 +1,44 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/theme/black.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/highlight/monokai.css" />
+    <style>
+      @import url('/lectures/src/assets/theme.css') layer;
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <slot />
+      </div>
+    </div>
+
+    <script>
+      import Reveal from 'reveal.js';
+      import Markdown from 'reveal.js/plugin/markdown/markdown.esm.js';
+      import Highlight from 'reveal.js/plugin/highlight/highlight.esm.js';
+      import Notes from 'reveal.js/plugin/notes/notes.esm.js';
+      import Math from 'reveal.js/plugin/math/math.esm.js';
+
+      Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        transition: 'none',
+        plugins: [Markdown, Highlight, Notes, Math.KaTeX],
+      });
+    </script>
+  </body>
+</html>

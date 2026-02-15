@@ -1,0 +1,20 @@
+---
+import MarkdownSlides from '../../layouts/MarkdownSlides.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const lectures = await getCollection('slides');
+  return lectures.map((lecture) => ({
+    params: { id: lecture.id },
+    props: { lecture },
+  }));
+}
+
+const { lecture } = Astro.props;
+---
+<MarkdownSlides
+  title={lecture.data.title}
+  author={lecture.data.author}
+  date={lecture.data.date}
+  body={lecture.body ?? ''}
+/>

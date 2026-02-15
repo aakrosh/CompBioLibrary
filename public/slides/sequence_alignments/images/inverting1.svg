@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="248.08958mm"
+   height="73.395729mm"
+   viewBox="0 0 248.08958 73.395729"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   sodipodi:docname="inverting1.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.78741022"
+     inkscape:cx="551.17395"
+     inkscape:cy="273.682"
+     inkscape:window-width="1959"
+     inkscape:window-height="811"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     fit-margin-top="1"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="1" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect67071"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect60173"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect46393"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-8.7583284,-8.6467648)">
+    <rect
+       style="fill:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect1202"
+       width="252.01286"
+       height="78.291992"
+       x="7.750277"
+       y="8.3107481" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.416532"
+       y="17.472891"
+       id="text6274"><tspan
+         sodipodi:role="line"
+         id="tspan6272"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.264583"
+         x="10.416532"
+         y="17.472891"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459"
+   id="tspan18298"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan39436">$</tspan><tspan
+   id="tspan3547"
+   style="fill:#000000;fill-opacity:0.43">a</tspan>baab</tspan>a</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.401883"
+       y="27.900993"
+       id="text21650"><tspan
+         sodipodi:role="line"
+         id="tspan21648"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459;stroke-width:0.264583"
+         x="10.401883"
+         y="27.900993"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan40246">a</tspan><tspan
+   id="tspan4823"
+   style="fill:#000000;fill-opacity:0.43">$</tspan>abaa<tspan
+   style="fill:#000000;fill-opacity:1"
+   id="tspan32532">b</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.099149"
+       y="69.613411"
+       id="text24188"><tspan
+         sodipodi:role="line"
+         id="tspan24186"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.264583"
+         x="10.099149"
+         y="69.613411"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459"
+   id="tspan24184"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan43826">b</tspan><tspan
+   id="tspan7011"
+   style="fill:#000000;fill-opacity:0.43">a</tspan>$aba</tspan>a</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.401883"
+       y="48.912445"
+       id="text25288"><tspan
+         sodipodi:role="line"
+         id="tspan25286"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459;stroke-width:0.264583"
+         x="10.401883"
+         y="48.912445"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan41202">aba</tspan>$ab<tspan
+   style="fill:#000000;fill-opacity:1"
+   id="tspan34661">a</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.401883"
+       y="38.703026"
+       id="text26032"><tspan
+         sodipodi:role="line"
+         id="tspan26030"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.264583"
+         x="10.401883"
+         y="38.703026"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459"
+   id="tspan26028"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan41922">a</tspan><tspan
+   id="tspan5355"
+   style="fill:#000000;fill-opacity:0.43">a</tspan>ba$a</tspan>b</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.099149"
+       y="80.041519"
+       id="text27068"><tspan
+         sodipodi:role="line"
+         id="tspan27066"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.264583"
+         x="10.099149"
+         y="80.041519"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43459"
+   id="tspan27064"><tspan
+   style="fill:#000000;fill-opacity:0.43"
+   id="tspan44714">baaba</tspan>$</tspan>a</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:10px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:2.64583px;word-spacing:0.137583px;stroke-width:0.264583"
+       x="10.401883"
+       y="59.18531"
+       id="text28224"><tspan
+         sodipodi:role="line"
+         id="tspan28222"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.264583"
+         x="10.401883"
+         y="59.18531"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:0.43"
+   id="tspan28220">abaaba</tspan>$</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import '../assets/style.css';
+
+const lectures = await getCollection('slides');
+lectures.sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? ''));
+---
+<Layout title="CompBioLibrary">
+  <main>
+    <header>
+      <h1>CompBioLibrary</h1>
+      <p class="subtitle">Computational Biology Lectures</p>
+    </header>
+    <div class="lectures">
+      {lectures.map((lecture) => (
+        <a class="card" href={`${import.meta.env.BASE_URL}slides/${lecture.id}/`}>
+          <h2>{lecture.data.title}</h2>
+          {lecture.data.description && <p>{lecture.data.description}</p>}
+          <div class="meta">
+            {lecture.data.author && <span>{lecture.data.author}</span>}
+            {lecture.data.date && <span>{lecture.data.date}</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>
