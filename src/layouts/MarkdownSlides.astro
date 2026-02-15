@@ -38,6 +38,9 @@ const showTitleSlide = !!(title && (author || date));
       </div>
     </div>
 
+    <script is:inline src="/socket.io/socket.io.js"></script>
+    <script is:inline src="/reveal-notes-server/client.js"></script>
+
     <script>
       import Reveal from 'reveal.js';
       import Markdown from 'reveal.js/plugin/markdown/markdown.esm.js';
