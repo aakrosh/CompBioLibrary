@@ -248,7 +248,7 @@ Note: Key distinction for CS students: substring = contiguous, subsequence = sam
 
 * $|x|=n,\ |y|=m, \ n > m$
 * Longest alignment : $n+m$ entries
-* Alignment is a gap-placement algorithm
+* LCS is a gap-placement algorithm
 * ${n+m \choose n}$ ways of placing gaps in $y \approx 2^{m+n}$
 
 ![viz](images/large_values_viz.png) <!-- .element height="30%" width="30%" -->
