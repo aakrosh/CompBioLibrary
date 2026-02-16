@@ -283,7 +283,7 @@ Note: Think of LCS as a special case of alignment where match=1, mismatch=0, gap
   * Score is added through the search space
   * Traceback common, find optimal path based on the individual choices -->
 
-Note: These two properties are the litmus test for whether DP applies. Optimal substructure: the best alignment of two full sequences contains the best alignment of their prefixes. Overlapping subproblems: when we recursively break down the problem, we encounter the same prefix alignments over and over. DP exploits this by computing each subproblem once and storing the result. Contrast with greedy algorithms (also require optimal substructure but make irrevocable local choices) — greedy is faster but does not guarantee a global optimum. Dijkstra's shortest path is a classic greedy example that does work optimally due to special structure of the problem.
+Note: These two properties are the litmus test for whether DP applies. Optimal substructure: the best solution should contain the best solution for the subset of the problem. Overlapping subproblems: when we recursively break down the problem, we encounter the same prefix alignments over and over. DP exploits this by computing each subproblem once and storing the result. Contrast with greedy algorithms (also require optimal substructure but make irrevocable local choices) — greedy is faster but does not guarantee a global optimum. Dijkstra's shortest path is a classic greedy example that does work optimally due to special structure of the problem.
 
 ---
 
