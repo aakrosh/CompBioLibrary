@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "present": "astro build && cd dist && reveal-notes-server"
+    "present": "astro build --base / && cd dist && reveal-notes-server"
   },
   "dependencies": {
     "astro": "^5.3.0",

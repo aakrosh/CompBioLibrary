@@ -287,6 +287,87 @@ Note: These two properties are the litmus test for whether DP applies. Optimal s
 
 ---
 
+## Coin change problem
+
+Given coin denominations $[1, 3, 4]$ and a target amount $n$, find the **minimum number of coins** to make change for $n$.
+
+* Example: make change for $6$
+  * $6 = 1+1+1+1+1+1$ → 6 coins
+  * $6 = 3+3$ → 2 coins ✓
+* Greedy approach (always pick the largest coin):
+  * $6 = 4+1+1$ → 3 coins (not optimal!)
+* Greedy fails here — we need dynamic programming
+
+Note: This is a classic CS problem that illustrates why DP is necessary. The greedy approach — always picking the largest coin that fits — gives 3 coins (4+1+1), but the optimal answer is 2 coins (3+3). Greedy fails because the locally optimal choice (picking 4) prevents us from finding the globally optimal solution. This is exactly analogous to sequence alignment: a greedy matcher that always extends the current match might miss a better alignment that requires inserting a gap first.
+
+---
+
+## Coin change: optimal substructure
+
+To make change for amount $n$, the last coin we use has some value $c$.
+
+* The remaining amount is $n - c$
+* If our solution for $n$ is optimal, then the sub-solution for $n - c$ **must also be optimal**
+* Otherwise, we could improve the overall solution by improving the sub-solution
+
+$$\text{minCoins}(n) = 1 + \min_{c \in \text{coins}} \text{minCoins}(n - c)$$
+
+This is **optimal substructure**: the optimal solution contains optimal solutions to subproblems.
+
+Note: Walk through the logic: suppose the best way to make change for 6 uses a coin of value 3 as the last coin. Then the remaining problem is making change for 3. If we did NOT use the best solution for 3, we could swap in the better solution and improve our answer for 6 — contradicting optimality. This proof-by-contradiction argument is exactly the same structure we will see for sequence alignment, where the optimal alignment of two full sequences contains the optimal alignment of their prefixes.
+
+---
+
+## Coin change: overlapping subproblems
+
+Recursive call tree for $\text{minCoins}(6)$ with coins $[1, 3, 4]$:
+
+```text
+                    6
+                /   |   \
+              5     3     2
+            / | \  /|\   /|\
+           4  2  1 2 0 -1 1 -1 -2
+          ...
+```
+
+* $\text{minCoins}(2)$ is computed **multiple times**
+* Without memoization: exponential work
+* With DP table: compute each subproblem **once** → $O(n \times |\text{coins}|)$
+
+Note: Count the repeated subproblems: minCoins(2) appears at least twice, minCoins(1) appears many more times. A naive recursive implementation would recompute these over and over, leading to exponential time. DP solves this by filling a table from minCoins(0) up to minCoins(6), computing each entry exactly once. This is exactly the same waste we will see in the recursive sequence alignment — aligning the same pair of prefixes gets recomputed exponentially many times without a table.
+
+---
+
+## Coin change: the DP table
+
+Coins: $[1, 3, 4]$, target: $6$
+
+| Amount | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|--------|---|---|---|---|---|---|---|
+| minCoins | 0 | 1 | 2 | 1 | 1 | 2 | 2 |
+
+* Fill left to right: each cell looks back at positions $n-1$, $n-3$, $n-4$
+* $\text{minCoins}(6) = 1 + \min(\text{minCoins}(5), \text{minCoins}(3), \text{minCoins}(2)) = 1 + \min(2, 1, 2) = 2$
+
+Note: Walk through filling the table: minCoins(0)=0 (base case). minCoins(1)=1+minCoins(0)=1 (only coin 1 fits). minCoins(2)=1+minCoins(1)=2. minCoins(3)=1+min(minCoins(2), minCoins(0))=1+0=1 (use coin 3). minCoins(4)=1+min(minCoins(3), minCoins(1), minCoins(0))=1+0=1 (use coin 4). minCoins(5)=1+min(minCoins(4), minCoins(2), minCoins(1))=1+1=2. minCoins(6)=1+min(minCoins(5), minCoins(3), minCoins(2))=1+1=2. The answer is 2 coins (two 3s). Notice the pattern: each cell depends on a fixed number of earlier cells, just like in the alignment matrix where each cell depends on three neighbors.
+
+---
+
+## From coins to sequences
+
+| | Coin change | Sequence alignment |
+|---|---|---|
+| **Subproblem** | min coins for amount $n$ | optimal alignment of prefixes $x[1..i]$, $y[1..j]$ |
+| **Optimal substructure** | optimal for $n$ contains optimal for $n-c$ | optimal for $(i,j)$ contains optimal for a smaller prefix pair |
+| **Overlapping subproblems** | same amount computed many times | same prefix pair computed many times |
+| **Table** | 1D array indexed by amount | 2D matrix indexed by $(i,j)$ |
+| **Recurrence** | min over coin choices | max over match, gap-in-x, gap-in-y |
+
+Note: The coin change problem is one-dimensional DP — a single parameter (the remaining amount). Sequence alignment is two-dimensional — two parameters (the prefix lengths). But the structure is identical: define subproblems, write a recurrence, fill a table, and trace back to recover the solution. If you understood coin change, you understand the algorithmic skeleton of Needleman-Wunsch. The only difference is the specific choices at each step and the scoring scheme.
+
+---
+
 ## Sequence alignments: Optimal substructure
 
 Let $X=[x_1,\...,x_m]$ and $Y=[y_1,\...,y_n]$ be sequences, and $Z=[z_1,\...,z_k]$ be a LCS of $X$ and $Y$.
