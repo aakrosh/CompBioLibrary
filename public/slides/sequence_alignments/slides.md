@@ -1003,4 +1003,4 @@ Note: And this is the BLAST pipeline. The contrast: BLAST is a heuristic — it 
 
 ## Interactive tool for sequence alignment
 
-<a href="/tools/alignment-tutor.html">Interactive Tool</a>
+<a href="https://aakrosh.github.io/CompBioLibrary/tools/alignment-tutor.html" target="_blank">Interactive Tool</a>
