@@ -1000,3 +1000,7 @@ Note: And this is the BLAST pipeline. The contrast: BLAST is a heuristic — it 
 | **Greedy algorithm** | Makes the locally optimal choice at each step; fast but not always globally optimal |
 
 ---
+
+## Interactive tool for sequence alignment
+
+<a href="/tools/alignment-tutor.html">Interactive Tool</a>

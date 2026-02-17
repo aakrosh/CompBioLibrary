@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence Alignment Algorithm Tutor</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const SequenceAlignmentTutor = () => {
+          const [algorithm, setAlgorithm] = useState('needleman-wunsch');
+          const [seq1, setSeq1] = useState('ACGT');
+          const [seq2, setSeq2] = useState('AGT');
+          const [matchScore, setMatchScore] = useState(1);
+          const [mismatchScore, setMismatchScore] = useState(-1);
+          const [gapPenalty, setGapPenalty] = useState(-2);
+          const [isInitialized, setIsInitialized] = useState(false);
+          const [currentStep, setCurrentStep] = useState(0);
+          const [matrix, setMatrix] = useState([]);
+          const [traceback, setTraceback] = useState([]);
+          const [phase, setPhase] = useState('setup');
+          const [explanation, setExplanation] = useState('');
+          const [isPlaying, setIsPlaying] = useState(false);
+          const [playSpeed, setPlaySpeed] = useState(1000);
+          const [alignment, setAlignment] = useState({ seq1: '', seq2: '', score: 0 });
+          const [showSettings, setShowSettings] = useState(false);
+
+          const totalInitSteps = (seq1.length + 1) + seq2.length;
+          const totalFillSteps = seq1.length * seq2.length;
+
+          useEffect(() => {
+            let interval;
+            if (isPlaying && phase !== 'complete') {
+              interval = setInterval(() => {
+                stepForward();
+              }, playSpeed);
+            }
+            return () => clearInterval(interval);
+          }, [isPlaying, currentStep, phase]);
+
+          const initializeMatrix = () => {
+            const rows = seq2.length + 1;
+            const cols = seq1.length + 1;
+            const mat = Array(rows).fill(null).map(() => 
+              Array(cols).fill(null).map(() => ({ 
+                score: null, 
+                arrows: [], 
+                computed: false,
+                inPath: false 
+              }))
+            );
+            
+            setMatrix(mat);
+            setCurrentStep(0);
+            setPhase('init');
+            setIsInitialized(true);
+            setAlignment({ seq1: '', seq2: '', score: 0 });
+            setTraceback([]);
+            setExplanation('Starting initialization phase. We will fill the first row and column.');
+          };
+
+          const stepForward = () => {
+            if (phase === 'setup') return;
+
+            if (phase === 'init') {
+              if (currentStep < totalInitSteps) {
+                fillInitStep(currentStep);
+                setCurrentStep(currentStep + 1);
+              } else {
+                setPhase('fill');
+                setCurrentStep(0);
+                setExplanation('Now filling the matrix cell by cell.');
+              }
+            } else if (phase === 'fill') {
+              if (currentStep < totalFillSteps) {
+                fillMatrixStep(currentStep);
+                setCurrentStep(currentStep + 1);
+              } else {
+                setPhase('traceback');
+                setCurrentStep(0);
+                startTraceback();
+              }
+            } else if (phase === 'traceback') {
+              if (currentStep < traceback.length) {
+                setCurrentStep(currentStep + 1);
+                updateExplanationForTraceback(currentStep + 1);
+              } else {
+                setPhase('complete');
+                setIsPlaying(false);
+                setExplanation('Alignment complete!');
+              }
+            }
+          };
+
+          const stepBackward = () => {
+            if (currentStep > 0) {
+              setCurrentStep(currentStep - 1);
+              if (phase === 'traceback') {
+                updateExplanationForTraceback(currentStep - 1);
+              }
+            } else if (phase === 'fill') {
+              setPhase('init');
+              setCurrentStep(totalInitSteps - 1);
+            } else if (phase === 'traceback') {
+              setPhase('fill');
+              setCurrentStep(totalFillSteps - 1);
+            }
+          };
+
+          const fillInitStep = (step) => {
+            const newMatrix = JSON.parse(JSON.stringify(matrix));
+            
+            if (step === 0) {
+              newMatrix[0][0] = { score: 0, arrows: [], computed: true, inPath: false };
+              setExplanation('Cell [0,0] initialized to 0 (no alignment yet).');
+            } else if (step <= seq1.length) {
+              const col = step;
+              if (algorithm === 'needleman-wunsch') {
+                newMatrix[0][col] = { 
+                  score: col * gapPenalty, 
+                  arrows: ['left'], 
+                  computed: true,
+                  inPath: false 
+                };
+                setExplanation(`Cell [0,${col}]: Gap in sequence 2, score = ${col} × ${gapPenalty} = ${col * gapPenalty}`);
+              } else {
+                newMatrix[0][col] = { 
+                  score: 0, 
+                  arrows: ['left'], 
+                  computed: true,
+                  inPath: false 
+                };
+                setExplanation(`Cell [0,${col}]: Smith-Waterman initializes first row to 0 (local alignment).`);
+              }
+            } else {
+              const row = step - seq1.length;
+              if (algorithm === 'needleman-wunsch') {
+                newMatrix[row][0] = { 
+                  score: row * gapPenalty, 
+                  arrows: ['up'], 
+                  computed: true,
+                  inPath: false 
+                };
+                setExplanation(`Cell [${row},0]: Gap in sequence 1, score = ${row} × ${gapPenalty} = ${row * gapPenalty}`);
+              } else {
+                newMatrix[row][0] = { 
+                  score: 0, 
+                  arrows: ['up'], 
+                  computed: true,
+                  inPath: false 
+                };
+                setExplanation(`Cell [${row},0]: Smith-Waterman initializes first column to 0 (local alignment).`);
+              }
+            }
+            
+            setMatrix(newMatrix);
+          };
+
+          const fillMatrixStep = (step) => {
+            const row = Math.floor(step / seq1.length) + 1;
+            const col = (step % seq1.length) + 1;
+            
+            const newMatrix = JSON.parse(JSON.stringify(matrix));
+            
+            const char1 = seq1[col - 1];
+            const char2 = seq2[row - 1];
+            const match = char1 === char2 ? matchScore : mismatchScore;
+            
+            const diagonal = newMatrix[row - 1][col - 1].score + match;
+            const left = newMatrix[row][col - 1].score + gapPenalty;
+            const up = newMatrix[row - 1][col].score + gapPenalty;
+            
+            let maxScore = Math.max(diagonal, left, up);
+            if (algorithm === 'smith-waterman') {
+              maxScore = Math.max(0, maxScore);
+            }
+            
+            const arrows = [];
+            if (maxScore === diagonal && (algorithm === 'needleman-wunsch' || diagonal > 0)) arrows.push('diagonal');
+            if (maxScore === left && (algorithm === 'needleman-wunsch' || left > 0)) arrows.push('left');
+            if (maxScore === up && (algorithm === 'needleman-wunsch' || up > 0)) arrows.push('up');
+            
+            newMatrix[row][col] = { 
+              score: maxScore, 
+              arrows, 
+              computed: true,
+              inPath: false 
+            };
+            
+            setMatrix(newMatrix);
+            
+            // Get partial alignments for each direction
+            const getPartialAlignment = (r, c) => {
+              if (!newMatrix[r] || !newMatrix[r][c]) return { seq1: '', seq2: '' };
+              
+              let tempRow = r;
+              let tempCol = c;
+              let align1 = '';
+              let align2 = '';
+              
+              // Trace back from this cell
+              while (tempRow > 0 || tempCol > 0) {
+                const tempCell = newMatrix[tempRow][tempCol];
+                if (!tempCell || !tempCell.arrows || tempCell.arrows.length === 0) break;
+                
+                if (tempCell.arrows.includes('diagonal')) {
+                  align1 = seq1[tempCol - 1] + align1;
+                  align2 = seq2[tempRow - 1] + align2;
+                  tempRow--;
+                  tempCol--;
+                } else if (tempCell.arrows.includes('left')) {
+                  align1 = seq1[tempCol - 1] + align1;
+                  align2 = '-' + align2;
+                  tempCol--;
+                } else if (tempCell.arrows.includes('up')) {
+                  align1 = '-' + align1;
+                  align2 = seq2[tempRow - 1] + align2;
+                  tempRow--;
+                } else {
+                  break;
+                }
+                
+                if (align1.length > 15) break; // Limit length for display
+              }
+              
+              return { seq1: align1, seq2: align2 };
+            };
+            
+            const diagonalAlign = getPartialAlignment(row - 1, col - 1);
+            const leftAlign = getPartialAlignment(row, col - 1);
+            const upAlign = getPartialAlignment(row - 1, col);
+            
+            const matchStr = char1 === char2 ? 'Match' : 'Mismatch';
+            const formatAlign = (align) => align.seq1.length > 0 ? `\n  ${align.seq1}\n  ${align.seq2}` : '';
+            
+            setExplanation(
+              `Computing cell [${row},${col}]: comparing '${char2}' with '${char1}'\n\n` +
+              `Diagonal: ${newMatrix[row - 1][col - 1].score} + ${match} (${matchStr}) = ${diagonal}${formatAlign({ seq1: diagonalAlign.seq1 + char1, seq2: diagonalAlign.seq2 + char2 })}\n\n` +
+              `Left: ${newMatrix[row][col - 1].score} + ${gapPenalty} (Gap in seq2) = ${left}${formatAlign({ seq1: leftAlign.seq1 + char1, seq2: leftAlign.seq2 + '-' })}\n\n` +
+              `Up: ${newMatrix[row - 1][col].score} + ${gapPenalty} (Gap in seq1) = ${up}${formatAlign({ seq1: upAlign.seq1 + '-', seq2: upAlign.seq2 + char2 })}\n\n` +
+              (algorithm === 'smith-waterman' ? `Max(0, ${Math.max(diagonal, left, up)}) = ${maxScore}` : `Maximum: ${maxScore}`)
+            );
+          };
+
+          const startTraceback = () => {
+            const newMatrix = JSON.parse(JSON.stringify(matrix));
+            const path = [];
+            let row, col;
+            
+            if (algorithm === 'needleman-wunsch') {
+              row = seq2.length;
+              col = seq1.length;
+              setExplanation('Starting traceback from bottom-right corner (global alignment).');
+            } else {
+              let maxScore = 0;
+              row = 0;
+              col = 0;
+              for (let i = 0; i <= seq2.length; i++) {
+                for (let j = 0; j <= seq1.length; j++) {
+                  if (newMatrix[i][j].score > maxScore) {
+                    maxScore = newMatrix[i][j].score;
+                    row = i;
+                    col = j;
+                  }
+                }
+              }
+              setExplanation(`Starting traceback from cell [${row},${col}] with maximum score ${maxScore} (local alignment).`);
+            }
+            
+            let align1 = '';
+            let align2 = '';
+            
+            while (row > 0 || col > 0) {
+              if (algorithm === 'smith-waterman' && newMatrix[row][col].score === 0) break;
+              
+              path.push([row, col]);
+              newMatrix[row][col].inPath = true;
+              
+              const arrows = newMatrix[row][col].arrows;
+              if (arrows.includes('diagonal')) {
+                align1 = seq1[col - 1] + align1;
+                align2 = seq2[row - 1] + align2;
+                row--;
+                col--;
+              } else if (arrows.includes('left')) {
+                align1 = seq1[col - 1] + align1;
+                align2 = '-' + align2;
+                col--;
+              } else if (arrows.includes('up')) {
+                align1 = '-' + align1;
+                align2 = seq2[row - 1] + align2;
+                row--;
+              } else {
+                break;
+              }
+            }
+            
+            if (row > 0 || col > 0) {
+              path.push([row, col]);
+              newMatrix[row][col].inPath = true;
+            }
+            
+            setTraceback(path);
+            setMatrix(newMatrix);
+            setAlignment({ 
+              seq1: align1, 
+              seq2: align2, 
+              score: matrix[algorithm === 'needleman-wunsch' ? seq2.length : path[0][0]][algorithm === 'needleman-wunsch' ? seq1.length : path[0][1]].score 
+            });
+          };
+
+          const updateExplanationForTraceback = (step) => {
+            if (step < traceback.length) {
+              const [row, col] = traceback[step];
+              setExplanation(`Following traceback arrow from cell [${row},${col}]`);
+            }
+          };
+
+          const reset = () => {
+            setIsInitialized(false);
+            setCurrentStep(0);
+            setPhase('setup');
+            setMatrix([]);
+            setTraceback([]);
+            setAlignment({ seq1: '', seq2: '', score: 0 });
+            setExplanation('');
+            setIsPlaying(false);
+          };
+
+          const loadExample = (example) => {
+            if (example === 'dna') {
+              setSeq1('ACGTACGT');
+              setSeq2('ACGTCGT');
+            } else if (example === 'protein') {
+              setSeq1('HEAGAWGHEE');
+              setSeq2('PAWHEAE');
+            }
+          };
+
+          const getCellColor = (row, col) => {
+            if (!matrix[row] || !matrix[row][col]) return 'bg-gray-100';
+            
+            const cell = matrix[row][col];
+            
+            if (phase === 'traceback' || phase === 'complete') {
+              if (cell.inPath) return 'bg-green-200';
+            }
+            
+            if (phase === 'fill') {
+              const currentFillRow = Math.floor(currentStep / seq1.length) + 1;
+              const currentFillCol = (currentStep % seq1.length) + 1;
+              if (row === currentFillRow && col === currentFillCol) return 'bg-yellow-200';
+            }
+            
+            if (cell.computed) {
+              if (algorithm === 'smith-waterman' && cell.score === 0 && row !== 0 && col !== 0) {
+                return 'bg-gray-200';
+              }
+              return 'bg-blue-100';
+            }
+            
+            return 'bg-gray-50';
+          };
+
+          const getArrowSymbol = (arrows) => {
+            if (!arrows || arrows.length === 0) return '';
+            if (arrows.includes('diagonal')) return '↖';
+            if (arrows.includes('left')) return '←';
+            if (arrows.includes('up')) return '↑';
+            return '';
+          };
+
+          // Icons as SVG components
+          const PlayIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          );
+
+          const PauseIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          );
+
+          const ChevronRightIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          );
+
+          const ChevronLeftIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          );
+
+          const RotateCcwIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          );
+
+          const SettingsIcon = () => (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m5.5-13v6m0 6v6m5.5-13v6m0 6v6"></path>
+            </svg>
+          );
+
+          return (
+            <div className="w-full max-w-6xl mx-auto p-6 bg-white">
+              <h1 className="text-3xl font-bold mb-6 text-center text-blue-900">
+                Sequence Alignment Algorithm Tutor
+              </h1>
+              
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Algorithm</label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          value="needleman-wunsch"
+                          checked={algorithm === 'needleman-wunsch'}
+                          onChange={(e) => setAlgorithm(e.target.value)}
+                          disabled={isInitialized}
+                          className="mr-2"
+                        />
+                        Needleman-Wunsch (Global)
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          value="smith-waterman"
+                          checked={algorithm === 'smith-waterman'}
+                          onChange={(e) => setAlgorithm(e.target.value)}
+                          disabled={isInitialized}
+                          className="mr-2"
+                        />
+                        Smith-Waterman (Local)
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => loadExample('dna')}
+                      disabled={isInitialized}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm disabled:bg-gray-300"
+                    >
+                      DNA Example
+                    </button>
+                    <button
+                      onClick={() => loadExample('protein')}
+                      disabled={isInitialized}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm disabled:bg-gray-300"
+                    >
+                      Protein Example
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Sequence 1</label>
+                    <input
+                      type="text"
+                      value={seq1}
+                      onChange={(e) => setSeq1(e.target.value.toUpperCase())}
+                      disabled={isInitialized}
+                      className="w-full px-3 py-2 border rounded"
+                      placeholder="e.g., ACGT"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Sequence 2</label>
+                    <input
+                      type="text"
+                      value={seq2}
+                      onChange={(e) => setSeq2(e.target.value.toUpperCase())}
+                      disabled={isInitialized}
+                      className="w-full px-3 py-2 border rounded"
+                      placeholder="e.g., AGT"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 mb-4">
+                  <button
+                    onClick={() => setShowSettings(!showSettings)}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded text-sm"
+                  >
+                    <SettingsIcon />
+                    Scoring Scheme
+                  </button>
+                </div>
+                
+                {showSettings && (
+                  <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-white rounded">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Match Score</label>
+                      <input
+                        type="number"
+                        value={matchScore}
+                        onChange={(e) => setMatchScore(Number(e.target.value))}
+                        disabled={isInitialized}
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Mismatch Score</label>
+                      <input
+                        type="number"
+                        value={mismatchScore}
+                        onChange={(e) => setMismatchScore(Number(e.target.value))}
+                        disabled={isInitialized}
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Gap Penalty</label>
+                      <input
+                        type="number"
+                        value={gapPenalty}
+                        onChange={(e) => setGapPenalty(Number(e.target.value))}
+                        disabled={isInitialized}
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <button
+                  onClick={isInitialized ? reset : initializeMatrix}
+                  className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  disabled={!seq1 || !seq2}
+                >
+                  {isInitialized ? 'Reset' : 'Initialize'}
+                </button>
+              </div>
+              
+              {isInitialized && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={stepBackward}
+                        disabled={currentStep === 0 && phase === 'init'}
+                        className="p-2 bg-gray-300 rounded hover:bg-gray-400 disabled:bg-gray-200"
+                      >
+                        <ChevronLeftIcon />
+                      </button>
+                      
+                      <button
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        disabled={phase === 'complete'}
+                        className="p-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
+                      >
+                        {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                      </button>
+                      
+                      <button
+                        onClick={stepForward}
+                        disabled={phase === 'complete'}
+                        className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+                      >
+                        <ChevronRightIcon />
+                      </button>
+                      
+                      <button
+                        onClick={reset}
+                        className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        <RotateCcwIcon />
+                      </button>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm">Speed:</label>
+                      <select
+                        value={playSpeed}
+                        onChange={(e) => setPlaySpeed(Number(e.target.value))}
+                        className="px-2 py-1 border rounded text-sm"
+                      >
+                        <option value={2000}>Slow</option>
+                        <option value={1000}>Medium</option>
+                        <option value={500}>Fast</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm font-medium mb-2">
+                    Phase: <span className="text-blue-600 capitalize">{phase}</span>
+                    {phase !== 'setup' && phase !== 'complete' && (
+                      <span className="ml-4">
+                        Step: {currentStep} / {phase === 'init' ? totalInitSteps : phase === 'fill' ? totalFillSteps : traceback.length}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="p-3 bg-white rounded border text-sm whitespace-pre-wrap font-mono">
+                    {explanation || 'Ready to start'}
+                  </div>
+                </div>
+              )}
+              
+              {isInitialized && matrix.length > 0 && (
+                <div className="mb-6 overflow-x-auto">
+                  <div className="inline-block min-w-full">
+                    <table className="border-collapse">
+                      <thead>
+                        <tr>
+                          <th className="border p-2 bg-gray-200"></th>
+                          <th className="border p-2 bg-gray-200"></th>
+                          {seq1.split('').map((char, i) => (
+                            <th key={i} className="border p-2 bg-gray-200 font-mono text-lg">{char}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {matrix.map((row, i) => (
+                          <tr key={i}>
+                            <th className="border p-2 bg-gray-200 font-mono text-lg">
+                              {i === 0 ? '' : seq2[i - 1]}
+                            </th>
+                            {row.map((cell, j) => (
+                              <td
+                                key={j}
+                                className={`border p-2 text-center ${getCellColor(i, j)} transition-colors duration-300`}
+                              >
+                                <div className="flex flex-col items-center">
+                                  {cell.score !== null && (
+                                    <div className="font-bold text-lg">{cell.score}</div>
+                                  )}
+                                  {cell.arrows && cell.arrows.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      {getArrowSymbol(cell.arrows)}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              
+              {(phase === 'traceback' || phase === 'complete') && alignment.seq1 && (
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-2">Alignment Result</h3>
+                  <div className="font-mono text-sm">
+                    <div>{alignment.seq1}</div>
+                    <div>
+                      {alignment.seq1.split('').map((c, i) => (
+                        <span key={i}>{c === alignment.seq2[i] ? '|' : ' '}</span>
+                      ))}
+                    </div>
+                    <div>{alignment.seq2}</div>
+                  </div>
+                  <div className="mt-2 font-semibold">
+                    Alignment Score: {alignment.score}
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-2">Legend</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gray-50 border"></div>
+                    <span>Not computed</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-yellow-200 border"></div>
+                    <span>Current cell</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-blue-100 border"></div>
+                    <span>Completed</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-green-200 border"></div>
+                    <span>Optimal path</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        ReactDOM.render(<SequenceAlignmentTutor />, document.getElementById('root'));
+    </script>
+</body>
+</html>
