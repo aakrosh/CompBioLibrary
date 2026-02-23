@@ -192,9 +192,7 @@ Real consequences:
 * **Repeats**: a repeated region may be well-covered but still unassemblable 
 * **Sequencing errors**: erroneous reads contribute coverage but cannot be assembled correctly
 
-In practice, confident assemblies require significantly more coverage than the model predicts — the exact amount depends on the assembler, technology, and genome complexity.
-
-Note: This is a critical slide — the model gives students intuition but they should not take the number literally. Ask them: if GC bias causes some regions to get 0x coverage no matter how much you sequence, what does that imply for the model? It means p=e^(-a) underestimates the true gap probability. For Illumina, regions with >70% or <30% GC are systematically under-represented. Repeats are equally important: a region covered by 30 reads is useless for assembly if all 30 reads map equally well to 100 different locations in the genome. The required coverage varies significantly by assembler, technology, and genome — the model's prediction should be treated as a theoretical lower bound, not a practical target.
+Note: In practice, confident assemblies require significantly more coverage than the model predicts — the exact amount depends on the assembler, technology, and genome complexity. This is a critical slide — the model gives students intuition but they should not take the number literally. Ask them: if GC bias causes some regions to get 0x coverage no matter how much you sequence, what does that imply for the model? It means p=e^(-a) underestimates the true gap probability. For Illumina, regions with >70% or <30% GC are systematically under-represented. Repeats are equally important: a region covered by 30 reads is useless for assembly if all 30 reads map equally well to 100 different locations in the genome. The required coverage varies significantly by assembler, technology, and genome — the model's prediction should be treated as a theoretical lower bound, not a practical target.
 
 ---
 
