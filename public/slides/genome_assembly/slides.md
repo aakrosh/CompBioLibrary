@@ -139,7 +139,7 @@ Note: This is the key simplifying assumption: reads start at uniformly random po
 ## Statistics
 
 * The probability that one of the $N$ reads starts at any specific nucleotide is $N/G$.
-* Expected # of reads starting in interval $I$ of length $L$ is $\frac{N}{G} L = a$
+* Expected # of reads starting in interval $I$ of length $L$ is $\frac{NL}{G} = a$
 
 Note: An interval of length L has L possible starting positions. Each has probability N/G of being a read start. So the expected number of read starts in the interval is (N/G)*L = NL/G = a, the coverage. This connects the coverage formula to the probability model. The interval I of length L corresponds to the window of positions from which a read would need to start in order to cover a given nucleotide.
 
@@ -157,7 +157,7 @@ Note: The Poisson distribution is appropriate here because: (1) reads arrive ind
 ## Statistics
 
 * The probability that one of the $N$ reads starts at any specific nucleotide is $N/G$.
-* Expected # of reads starting in interval $I$ of length $L$ is $\frac{N}{G} L = a$
+* Expected # of reads starting in interval $I$ of length $L$ is $\frac{NL}{G} = a$
 * We can assume a Poisson distribution
     * $\lambda$ events in a given interval
     * probability of k events = ${\frac {\lambda ^{k}e^{-\lambda }}{k!}}$
@@ -184,6 +184,24 @@ How much of the genome was sequenced?
   * So, sequence 13.8 billion nucleotides, and you will still miss 30 million positions in the genome
 
 Note: This is the Lander-Waterman model (1988). The key insight: even at high coverage, some positions will be missed due to random chance — gaps never completely disappear, they just become exponentially rare. To halve the gap fraction, you need to increase coverage by ln(2) ≈ 0.69. The 13.8 billion bp figure assumes a 3 Gb human genome: 4.6 × 3×10^9 = 13.8×10^9 bases sequenced, yet 1% of 3×10^9 = 30 million positions remain in gaps.
+
+---
+
+## $a \approx 4.6$ is an underestimate
+
+The model assumes:
+* Reads start at **uniformly random** positions — violated in practice
+* All covered positions can be **assembled** — violated by repeats
+* Reads are **error-free** — violated by sequencing technology
+
+Real consequences:
+* **GC bias**: Illumina under-sequences AT-rich and GC-extreme regions 
+* **Repeats**: a repeated region may be well-covered but still unassemblable 
+* **Sequencing errors**: erroneous reads contribute coverage but cannot be assembled correctly
+
+In practice, confident assemblies require significantly more coverage than the model predicts — the exact amount depends on the assembler, technology, and genome complexity.
+
+Note: This is a critical slide — the model gives students intuition but they should not take the number literally. Ask them: if GC bias causes some regions to get 0x coverage no matter how much you sequence, what does that imply for the model? It means p=e^(-a) underestimates the true gap probability. For Illumina, regions with >70% or <30% GC are systematically under-represented. Repeats are equally important: a region covered by 30 reads is useless for assembly if all 30 reads map equally well to 100 different locations in the genome. The required coverage varies significantly by assembler, technology, and genome — the model's prediction should be treated as a theoretical lower bound, not a practical target.
 
 ---
 
