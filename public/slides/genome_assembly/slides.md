@@ -344,6 +344,21 @@ Note: After transitive reduction, the graph ideally becomes a simple linear path
 
 ---
 
+## Assignment: genome assembler
+
+* Implement components of an OLC assembler in Python
+* **Part 1** (required): implement `simplify()` in `remove_transitive_edges.py`
+  * Takes an overlap graph, returns the graph with transitively-inferrable edges removed
+  * Test with `python3 test_remove_transitive_edges`
+* **Part 2** (optional): implement `calculate_scs()` in `shortest_common_superstring.py`
+  * Find the shortest string containing all input sequences as subsequences
+
+[https://github.com/uvacobi/genome_assembler](https://github.com/uvacobi/genome_assembler)
+
+Note: The required part directly implements what we just visualized — the transitive reduction step of the layout phase. Students are given a Graph class in graph.py that they can extend. They should not use networkx or other graph libraries. The optional shortest common superstring problem is a classic combinatorial problem related to assembly: given a set of reads, find the shortest sequence that contains all of them. It is NP-hard in general (related to the Hamiltonian path problem) but tractable for small inputs with dynamic programming.
+
+---
+
 ## Layout
 ![intro](images/layout.png) <!-- .element width="95%" height="95%" -->
 
