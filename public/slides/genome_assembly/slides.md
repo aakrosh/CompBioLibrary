@@ -129,19 +129,12 @@ Note: Coverage = total bases sequenced divided by genome size. NL is the total n
 
 * Assume reads are distributed uniformly through the genome.
 * The probability that one of the $N$ reads starts at any specific nucleotide is $N/G$.
+* Expected # of reads starting in interval $I$ of length $L$ is $\frac{NL}{G} = a$<!-- .element class="fragment" data-fragment-index="1" -->
+
 
 ![coverage](images/coverage.png)
 
-Note: This is the key simplifying assumption: reads start at uniformly random positions. In reality, coverage is not perfectly uniform — GC-rich regions are over-represented in Illumina sequencing, repetitive regions are ambiguous, etc. But uniform coverage is a useful first-order model. The probability that a specific read starts at a specific nucleotide is 1/G (there are G possible starting positions), so the probability that at least one of N reads starts there is approximately N/G for large G.
-
----
-
-## Statistics
-
-* The probability that one of the $N$ reads starts at any specific nucleotide is $N/G$.
-* Expected # of reads starting in interval $I$ of length $L$ is $\frac{NL}{G} = a$
-
-Note: An interval of length L has L possible starting positions. Each has probability N/G of being a read start. So the expected number of read starts in the interval is (N/G)*L = NL/G = a, the coverage. This connects the coverage formula to the probability model. The interval I of length L corresponds to the window of positions from which a read would need to start in order to cover a given nucleotide.
+Note: This is the key simplifying assumption: reads start at uniformly random positions. In reality, coverage is not perfectly uniform — GC-rich regions are over-represented in Illumina sequencing, repetitive regions are ambiguous, etc. But uniform coverage is a useful first-order model. The probability that a specific read starts at a specific nucleotide is 1/G (there are G possible starting positions), so the probability that at least one of N reads starts there is approximately N/G for large G. An interval of length L has L possible starting positions. Each has probability N/G of being a read start. So the expected number of read starts in the interval is (N/G)*L = NL/G = a, the coverage. This connects the coverage formula to the probability model. The interval I of length L corresponds to the window of positions from which a read would need to start in order to cover a given nucleotide.
 
 ---
 
