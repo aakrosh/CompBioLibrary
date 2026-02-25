@@ -227,7 +227,7 @@ Note: The choice of sequencing technology directly determines which assembly alg
 * Short reads (~150 bp) cannot span most repeats → graph tangles
 * Long reads (~15 kb) span most repeats → unambiguous placement
 
-Note: This is the fundamental reason for the long-read revolution in genome assembly. Alu elements are ~300 bp — a 15 kb PacBio read spans them easily. L1 elements are ~6 kb — still spanned by most long reads. Segmental duplications are the hardest challenge: at up to 500 kb, even long reads cannot span them, requiring Hi-C or other long-range information. The fraction of the genome that is "repeat-unresolvable" decreases as read lengths increase.
+Note: This is the fundamental reason for the long-read revolution in genome assembly. LINEs (Long Interspersed Nuclear Elements) and SINEs (Short Interspersed Nuclear Elements) are common types of retrotransposable elements (jumping genes) that make up over 34% of the human genome. Alu elements are ~300 bp — a 15 kb PacBio read spans them easily. L1 elements are ~6 kb — still spanned by most long reads. Segmental duplications are the hardest challenge: at up to 500 kb, even long reads cannot span them, requiring Hi-C or other long-range information. The fraction of the genome that is "repeat-unresolvable" decreases as read lengths increase.
 
 ---
 
@@ -643,5 +643,90 @@ Note: NG50 is preferred when comparing assemblies of different completeness — 
 | **Hash table** | Data structure for O(1) average-time lookup; used for k-mer counting |
 | **N50** | Contig length such that 50% of the assembly is in contigs at least this long |
 | **BUSCO** | Measure of assembly completeness based on presence of conserved single-copy genes |
+
+---
+
+## NCBI assembly model
+
+![Assembly Model](images/GRCh38p1_Assembly_Model.png)
+
+<small>Source: [NCBI Genome Assembly Model](https://www.ncbi.nlm.nih.gov/assembly/model/)</small>
+
+Note: Sequence updates that are released outside of the major assembly cycle are called patches. There are two types of patches: Fix patch: This patch is made in a region where the Tiling Path File (TPF) will change in the next major assembly update. These scaffolds will be withdrawn at the next major assembly update, the accessions will be made secondary to the chromosome and the sequence will be incorporated into the Primary Assembly TPF. Novel patch: These represent new alternate loci. At the next major assembly update, these sequences will be moved to the appropriate assembly-unit and the accession will remain stable. A sequence that provides an alternate representation of a locus found in the haploid assembly is called a alt loci. PAR Pseudo-autosomal region. A region found on the X and Y chromosomes of mammals that allows recombination between the sex chromosomes
+
+---
+
+## Which human genome should I use?
+
+Potential issues
+* Inclusion of ALT contigs
+* Inclusion of multi-placed sequences (e.g., PAR)
+* Chromosome names
+* Unplaced and unlocalized contigs
+
+[Heng Li: Which human reference genome to use](https://lh3.github.io/2017/11/13/which-human-reference-genome-to-use)
+
+---
+
+## Pangenomes
+
+![Pangenome](images/Pangenome-tube-map.jpg) <!-- .element height="80%" width="80%" -->
+
+<small>[Scientists release a new human “pangenome” reference](https://www.genome.gov/news/news-release/scientists-release-a-new-human-pangenome-reference) </small>
+
+---
+
+## Pangenomes
+
+![Pangenome](images/pangenome.png)
+
+<small>[PacBio](https://www.pacb.com/blog/the-hifi-difference-enabling-the-human-pangenome-reference) </small>
+
+---
+
+## Shortest Common Superstring
+Given set of strings $S$ find $SCS(S)$: shortest string containing the strings in $S$ as substrings
+![SCS](images/scs1.png)
+
+---
+
+## Idea 1: Enumerate all orders
+![order1](images/order1.png)
+
+---
+
+## Idea 1: Enumerate all orders
+![order2](images/order2.png)
+
+Try all possible orderings and pick shortest.
+
+Note: If S contains n strings, then how many orderings (n!). The SCS problem is NP-hard. Non-deterministic polynomial time hard problems contain the most complex problems in computer science. They are not only hard to solve but are hard to verify as well. In fact, some of these problems aren’t even decidable.
+
+---
+
+## Idea 2: Choose order prioritizing similarity
+![idea2](images/idea2.png)
+
+---
+
+## Idea 2: Choose order prioritizing similarity
+![idea2](images/idea2_simplified.png)
+
+Note: We keep on doing this, and we will have AAABBBA or AAABBAB as the result.
+
+---
+
+## Shortest common superstring
+![greedy](images/scs2.png)
+
+Note: The answer might be different if we try an equally reasonable order. For example, if we use ABB,BBA in the second step, then we get a superstring of length 9
+
+---
+
+## Shortest common superstring
+
+The greedy algorithm is a good approximation; i.e. the superstring yielded by the greedy algorithm won’t be more than ~2.5 times longer than true SCS (see Gusfield, Algorithms on Strings, Trees and Sequences: Computer Science and Computational Biology, 16.17.1)
+
+Note: Greedy algorithm is not guaranteed to choose overlaps yielding SCS
 
 ---
