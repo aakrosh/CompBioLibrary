@@ -15,7 +15,10 @@ const slides = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     author: z.string().optional(),
+    affiliation: z.string().optional(),
     date: z.string().optional(),
+    course: z.string().optional(),
+    googleFont: z.string().optional(),
   }),
 });
 

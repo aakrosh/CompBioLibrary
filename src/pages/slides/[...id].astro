@@ -14,7 +14,11 @@ const { lecture } = Astro.props;
 ---
 <MarkdownSlides
   title={lecture.data.title}
+  description={lecture.data.description}
   author={lecture.data.author}
+  affiliation={lecture.data.affiliation}
   date={lecture.data.date}
+  course={lecture.data.course}
+  googleFont={lecture.data.googleFont}
   body={lecture.body ?? ''}
 />
