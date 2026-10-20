@@ -573,16 +573,6 @@ Note: Variant annotation is not just for clinical interpretation — it is the e
 
 ---
 
-## Methods for Gene-Based Rare Variant Analysis
-
-<img src="images/image27.jpeg" alt="methods" class="r-stretch" style="background:#fff; padding:4px; border-radius:4px;">
-
-<small>Karczewski et al. 2022 · PMID: 35931660</small>
-
-Note: The figure is from the genebass study (Karczewski et al. 2022, PMID 35931660), a large-scale exome-based biobank analysis in the UK Biobank. Top left: case-control schematic showing how individuals with vs without a trait are sequenced. Top right: a gene-based Manhattan plot showing -log10(p) for gene-based tests across ~18 disease categories — each colored cluster is one disease category, and dots above the dashed line are exome-wide significant hits. Bottom left: dot plot showing that pLoF variants are proportionally more enriched among cases in the rarest MAF bins (0.0001–0.001) compared to missense or synonymous variants — the enrichment is highest for the rarest variants, validating the weighting strategy. The genebass logo represents the web resource where these results can be browsed interactively. This slide introduces the population-scale use case: instead of filtering variants for one patient, we are testing every gene in a cohort of thousands to find those where rare variant carriers have significantly different phenotypes.
-
----
-
 <!-- .slide: style="font-size:0.85em" -->
 ## Motivating Example: Rare Variants in *PCSK9*
 
