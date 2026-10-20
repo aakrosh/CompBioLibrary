@@ -51,8 +51,12 @@ Quality-focused — biological effect is absent
 <div class="r-stretch" style="display:flex; flex-direction:column; gap:0.5em; justify-content:center; text-align:left;">
 
 <div style="font-family:'Consolas','Courier New',monospace; color:#555; font-size:0.72em; line-height:1.55;">
-  <div>##fileformat=VCFv4.2 · ##reference=GRCh38 · ##FILTER=&lt;ID=PASS,Description="All filters passed"&gt;</div>
-  <div>##INFO=&lt;ID=DP,Type=Integer,Description="Read Depth"&gt; · ##FORMAT=&lt;ID=GT,Description="Genotype"&gt; · ##FORMAT=&lt;ID=GQ,Description="Genotype Quality"&gt;</div>
+  <div>##fileformat=VCFv4.2</div>
+  <div>##reference=GRCh38</div>
+  <div>##FILTER=&lt;ID=PASS,Description="All filters passed"&gt;</div>
+  <div>##INFO=&lt;ID=DP,Type=Integer,Description="Read Depth"&gt;</div>
+  <div>##FORMAT=&lt;ID=GT,Description="Genotype"&gt;</div>
+  <div>##FORMAT=&lt;ID=GQ,Description="Genotype Quality"&gt;</div>
 </div>
 
 <table style="width:100%; border-collapse:collapse; font-family:'Consolas','Courier New',monospace; font-size:0.78em; background:rgba(0,0,0,0.3); border-radius:6px; overflow:hidden; text-align:left;">
@@ -542,6 +546,17 @@ Note: A single PVS1 plus one supporting criterion is sufficient to classify a va
 ---
 
 <!-- .slide: style="font-size:0.85em" -->
+## ACMG/AMP categorical combining rules for variant classification
+
+<img src="images/image21.png" alt="combining rules for variant classification" class="r-stretch" style="background:#fff; padding:4px; border-radius:4px;">
+
+<small>PMID: 30095857</small>
+
+Note: A single PVS1 plus one supporting criterion is sufficient to classify a variant as Pathogenic. 
+
+---
+
+<!-- .slide: style="font-size:0.85em" -->
 ## Annotation Outputs Drive Variant Filtering
 
 The two parts of this lecture are directly connected:
@@ -884,11 +899,11 @@ Note: The figure summarizes four unique roles of rare variants in population-sca
 
 **Common variants (GWAS) — one SNP at a time:**
 
-$$Y = \alpha_0 + \beta \, G + \boldsymbol{\gamma}^T \mathbf{C} + \varepsilon \qquad G \in \{0,1,2\}$$
+$$Y = \alpha_0 + \beta G + \boldsymbol{\gamma}^T \mathbf{C} + \varepsilon \qquad G \in \{0,1,2\}$$
 
 **Rare variants — aggregate across a gene:**
 
-$$Y = \alpha_0 + \beta \, F(G_1, \ldots, G_k) + \boldsymbol{\gamma}^T \mathbf{C} + \varepsilon$$
+$$Y = \alpha_0 + \beta F(G_1, \ldots, G_k) + \boldsymbol{\gamma}^T \mathbf{C} + \varepsilon$$
 
 The choice of aggregation function $F$ defines the test.
 
@@ -932,7 +947,7 @@ Note: The choice of qualifying variant (QV) criteria has a large impact on power
 <!-- .slide: style="font-size:0.9em" -->
 ## Weighting
 
-$$w_j = \text{Beta}(\text{MAF}_j;\; a_1 = 1,\; a_2 = 25)$$
+$$w_j = \text{Beta}(\text{MAF}_j; a_1 = 1, a_2 = 25)$$
 
 Rarer variants receive higher weight; weight peaks at singletons and declines toward zero as MAF → 0.5.
 
@@ -947,9 +962,9 @@ Note: The plot shows three weighting schemes. Beta(1,25) — the SKAT default (r
 
 | Method | $F(G_1,\ldots,G_k)$ | Captures |
 |---|---|---|
-| **Collapsing** | $\mathbf{1}\!\left[\sum_j G_{ij} > 0\right]$ | Binary carrier status — any QV present? |
+| **Collapsing** | $\mathbf{1}\left[\sum_j G_{ij} > 0\right]$ | Binary carrier status — any QV present? |
 | **Count** | $\sum_j G_{ij}$ | Number of rare alleles carried |
-| **Weighted sum** | $\sum_j w_j\, G_{ij}$ | Allele frequency or function-weighted burden |
+| **Weighted sum** | $\sum_j w_j G_{ij}$ | Allele frequency or function-weighted burden |
 
 - Collapsing is most powerful under a **dominant, high-penetrance** model
 - Count / weighted sum gain power when **multiple rare alleles** per individual are informative
@@ -988,47 +1003,42 @@ Note: SAIGE and REGENIE were specifically designed for large biobank-scale rare 
 
 ---
 
-<!-- .slide: style="font-size:0.82em" -->
+<!-- .slide: style="font-size:0.85em" -->
 ## Burden Tests
 
-Assumption: truly associated variants have the **same direction of effect**
+Rare variants can't be tested one-at-a-time — too little power per variant. Instead, **aggregate across all rare variants in a gene**.
 
-**Regression model** — one $\beta$ for the whole gene's burden score:
+**Assumption:** all truly associated variants have the **same direction of effect** (all increase risk, or all decrease it)
 
-$$y = \alpha_0 + \alpha_1 PC_1 + \alpha_2 PC_2 + \ldots + \beta\underbrace{(w_1 G_1 + w_2 G_2 + \cdots)}_{\text{burden score}} + \varepsilon$$
+**Burden score** — a single weighted sum of rare genotypes, used as one predictor in a regression:
 
-<div style="display:flex; gap:2em; justify-content:center; align-items:flex-start; margin-top:0.5em;">
-<div style="flex:1; min-width:0;">
-
-**Per-variant score** (under $H_0$):
-
-$$S_j = \sum_{\text{samples}} G_j \,(y - \hat{y})$$
-
-</div>
-<div style="flex:1; min-width:0;">
+$$y = \alpha_0 + \boldsymbol{\alpha}^T \mathbf{C} + \beta \underbrace{(w_1 G_1 + w_2 G_2 + \cdots)}_{\text{burden score}} + \varepsilon$$
 
 **Score statistic** — test $H_0: \beta = 0$
 
-$$Q_{burden} = \left(\sum_{\text{variants}} w_j S_j\right)^2$$
+$$Q_{burden} = \left(\sum_j w_j S_j\right)^2, \qquad S_j = \sum_{\text{samples}} G_j (y - \hat{y})$$
 
-</div>
-</div>
+$S_j$ measures how strongly variant $j$'s genotype correlates with the phenotype residuals
 
-Note: The burden test works well when all risk variants have the same direction of effect. The complete score statistic is Q_burden = (r̃ᵀ G w)², where r̃ are the residuals from the null model (Y − μ̂), G is the genotype matrix (individuals × variants), and w is the weight vector. The residuals connect the genotype to the phenotype — without them the statistic is a function of genotype alone and cannot test association. The schematic form (squaring the weighted genotype sum) conveys the structural point: if some variants increase risk and others are protective, they cancel in the sum, and the test loses power.
+Note: The burden test works well when all risk variants have the same direction of effect. The complete score statistic is Q_burden = (r̃ᵀ G w)², where r̃ are the residuals from the null model (Y − μ̂), G is the genotype matrix (individuals × variants), and w is the weight vector. The residuals connect the genotype to the phenotype — without them the statistic is a function of genotype alone and cannot test association.
 
 ---
 
 <!-- .slide: style="font-size:0.85em" -->
-## Burden Tests: What If Effects Go in Opposite Directions?
+## Burden Tests: When Effects Cancel
 
-The burden score sums weighted contributions across variants:
+The statistic sums contributions **before** squaring — so opposite-direction effects cancel:
 
-$$Q_{burden} = \left(\sum_{\text{variants}} w_j S_j\right)^2, \quad S_j = \sum_{\text{samples}} G_j\,(y - \hat{y})$$
+- If all variants **increase** risk: $S_j > 0$ for all $j$ → large sum → good power
+- If some **increase** and others **decrease** risk: positive and negative $S_j$ cancel → **power loss**
 
-- If all variants **increase** risk: $S_j > 0$ for all $j$ → sum is large → good power
-- If some variants **increase** and others **decrease** risk: positive and negative $S_j$ cancel → sum shrinks → **power loss**
+Example — $S_1 = +3$ (risk variant), $S_2 = -3$ (protective variant):
 
-**Significance:** under $H_0$, the distribution of $Q$ may follow a chi-square distribution or be estimated using permutations
+$$Q_{burden} = (+3 + (-3))^2 = \mathbf{0} \qquad \text{— real signal, test sees nothing}$$
+
+**Use burden when** you have prior evidence that variants act in the same direction — e.g., loss-of-function variants in a haploinsufficient gene
+
+Under $H_0$, $Q_{burden}$ follows a chi-squared distribution or can be estimated by permutation
 
 Note: When variants have effects in opposite directions — some increasing risk, some protective — they cancel in the burden sum, and the test has low power. This is a known limitation of burden tests. It can occur in genes that act as tumor suppressors (where LoF increases cancer risk) but also contain common protective variants, or in any gene with functional bidirectional variation.
 
@@ -1037,11 +1047,9 @@ Note: When variants have effects in opposite directions — some increasing risk
 <!-- .slide: style="font-size:0.82em" -->
 ## Variance-Component Tests
 
-Allow for **opposite direction of effect** — square each variant's contribution before summing
+Solve the cancellation problem: **square first, then sum**
 
-**Score statistic (SKAT):** each variant contributes $(wS)^2$, so effects in opposite directions both add positively
-
-$$Q_{SKAT} = \sum_{\text{variants}} \left(w_j S_j\right)^2 = \tilde{\mathbf{r}}^T \mathbf{G} \mathbf{W}^2 \mathbf{G}^T \tilde{\mathbf{r}}$$
+$$Q_{SKAT} = \sum_j (w_j S_j)^2 \qquad \text{vs.} \qquad Q_{burden} = \left(\sum_j w_j S_j\right)^2$$
 
 <div style="display:flex; gap:2em; justify-content:center; margin-top:0.5em; font-size:0.88em;">
   <div style="text-align:center; background:rgba(230,159,0,0.12); border:1px solid rgba(230,159,0,0.3); padding:0.4em 1em; border-radius:6px;">
@@ -1053,6 +1061,13 @@ $$Q_{SKAT} = \sum_{\text{variants}} \left(w_j S_j\right)^2 = \tilde{\mathbf{r}}^
     <div>$(+3)^2 + (-3)^2 = \mathbf{18}$</div>
   </div>
 </div>
+
+**Full matrix form:**
+$$Q_{SKAT} = \tilde{\mathbf{r}}^T \mathbf{G} \mathbf{W}^2 \mathbf{G}^T \tilde{\mathbf{r}}$$
+
+where $\tilde{\mathbf{r}} = Y - \hat{\mu}(\mathbf{C})$ are residuals from the null model — the genotype predicts what the covariates couldn't
+
+**Trade-off:** when all variants truly go the same direction, burden is more powerful — squaring discards the sign information that burden exploits
 
 Note: SKAT (Sequence Kernel Association Test) solves the main weakness of burden tests: if some variants in a gene increase risk and others are protective, burden tests lose power because the signal cancels in the sum. SKAT avoids this by squaring each per-variant score S_j before summing. In matrix form, Q_SKAT = r̃ᵀ G W² Gᵀ r̃, where r̃ are the null-model residuals, G is the genotype matrix, and W is the diagonal weight matrix. Squaring ensures that a variant with S_j = −3 contributes (−3)² = 9 to the statistic, the same as a variant with S_j = +3. The distribution of Q_SKAT under H₀ follows a mixture of chi-squared distributions, computed from the eigenvalues of a kernel matrix — this is why SKAT requires a dedicated software implementation rather than a standard regression package.
 
